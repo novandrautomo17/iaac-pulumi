@@ -1,5 +1,5 @@
 import pulumi
-from vpc import vpc, subnet1, subnet2, igw, route_table, route_table_assoc
+from vpc import vpc, subnet1, subnet2, igw, route_table, route_table_assoc1, route_table_assoc2
 from bastion_host import bastion, bastion_sg
 from eks import cluster, node_group
 
