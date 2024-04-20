@@ -1,6 +1,8 @@
 import pulumi
+import json
 import pulumi_aws as aws
 from vpc import vpc, subnet1, subnet2
+
 
 eks_role = aws.iam.Role("eks-role",
     assume_role_policy=json.dumps({
