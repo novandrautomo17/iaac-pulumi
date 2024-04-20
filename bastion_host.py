@@ -1,6 +1,6 @@
 import pulumi
 import pulumi_aws as aws
-from vpc import subnet1, subnet2, vpc
+from vpc import subnet_public, subnet_private, vpc
 
 # Security Group for the Bastion Host
 bastion_sg = aws.ec2.SecurityGroup("bastion-sg",
@@ -28,6 +28,6 @@ bastion = aws.ec2.Instance("my-bastion",
     instance_type="t2.micro",
     vpc_security_group_ids=[bastion_sg.id],
     ami="ami-0b6c537bac50bac75",  # Make sure to replace with the correct AMI for your region
-    subnet_id=subnet1.id,
+    subnet_id=subnet_public.id,
     associate_public_ip_address=True,
     key_name="my-keypair")  # Ensure you have this keypair created
