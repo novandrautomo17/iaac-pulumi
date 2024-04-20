@@ -84,4 +84,4 @@ route_table_private = aws.ec2.RouteTable("my-route-table-private",
 # Associate Private Subnet with Route Table
 route_table_assoc_private = aws.ec2.RouteTableAssociation("my-route-table-assoc-private",
     route_table_id=route_table_private.id,
-    subnet_id=subnet_private.id)
+    subnet_id=subnet_private_1.id)
