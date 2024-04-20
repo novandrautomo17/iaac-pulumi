@@ -20,7 +20,7 @@ igw = aws.ec2.InternetGateway("my-igw",
 # Public Subnet (for Internet-facing Instances)
 subnet_public = aws.ec2.Subnet("my-subnet-public",
     vpc_id=vpc.id,
-    cidr_block="10.0.1.0/24",
+    cidr_block="10.0.11.0/24",
     availability_zone="ap-southeast-1a",
     map_public_ip_on_launch=True,  # Enables public IP assignment
     tags={
@@ -30,7 +30,7 @@ subnet_public = aws.ec2.Subnet("my-subnet-public",
 # Private Subnet (for EKS Node Group)
 subnet_private = aws.ec2.Subnet("my-subnet-private",
     vpc_id=vpc.id,
-    cidr_block="10.0.2.0/24",
+    cidr_block="10.0.21.0/24",
     availability_zone="ap-southeast-1b",
     map_public_ip_on_launch=False,  # Disables public IP assignment
     tags={
