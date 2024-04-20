@@ -28,14 +28,19 @@ subnet_public = aws.ec2.Subnet("my-subnet-public",
     })
 
 # Private Subnet (for EKS Node Group)
-subnet_private = aws.ec2.Subnet("my-subnet-private",
+subnet_private_1 = aws.ec2.Subnet("subnet-private-1",
     vpc_id=vpc.id,
-    cidr_block="10.0.21.0/24",
-    availability_zone="ap-southeast-1b",
-    map_public_ip_on_launch=False,  # Disables public IP assignment
-    tags={
-        "Name": "my-private-subnet",
-    })
+    cidr_block="10.0.1.0/24",
+    availability_zone="ap-southeast-1a",  # First AZ
+    tags={"Name": "my-private-subnet-1"})
+
+subnet_private_2 = aws.ec2.Subnet("subnet-private-2",
+    vpc_id=vpc.id,
+    cidr_block="10.0.2.0/24",
+    availability_zone="ap-southeast-1b",  # Second AZ
+    tags={"Name": "my-private-subnet-2"})
+
+
 
 # Create a Route Table for Public Subnet
 route_table_public = aws.ec2.RouteTable("my-route-table-public",

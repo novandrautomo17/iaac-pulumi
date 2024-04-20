@@ -1,7 +1,7 @@
 import pulumi
 import json
 import pulumi_aws as aws
-from vpc import vpc, subnet_private, subnet_public
+from vpc import vpc, subnet_private_1, subnet_private_2, subnet_public
 
 # IAM Role for EKS Cluster
 eks_role = aws.iam.Role("eks-role",
