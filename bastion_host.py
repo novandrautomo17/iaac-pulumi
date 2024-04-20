@@ -28,6 +28,6 @@ bastion = aws.ec2.Instance("my-bastion",
     instance_type="t2.micro",
     vpc_security_group_ids=[bastion_sg.id],
     ami="ami-0b0fa5ad7661e3d4b",  # Make sure to replace with the correct AMI for your region
-    subnet_id=subnet.id,
+    subnet_id=subnet1.id,
     associate_public_ip_address=True,
     key_name="my-keypair")  # Ensure you have this keypair created
