@@ -14,30 +14,31 @@ vpc = aws.ec2.Vpc("my-vpc",
 igw = aws.ec2.InternetGateway("my-igw",
     vpc_id=vpc.id,
     tags={
-        "Name": "my-igw",
+        "Name": "my-internet-gateway",
     })
 
-# Create Subnets in different Availability Zones
-subnet1 = aws.ec2.Subnet("my-subnet-1",
+# Public Subnet (for Internet-facing Instances)
+subnet_public = aws.ec2.Subnet("my-subnet-public",
     vpc_id=vpc.id,
-    cidr_block="10.0.10.0/24",  # Updated non-conflicting CIDR block
+    cidr_block="10.0.1.0/24",
     availability_zone="ap-southeast-1a",
-    map_public_ip_on_launch=True,
+    map_public_ip_on_launch=True,  # Enables public IP assignment
     tags={
-        "Name": "my-subnet-1",
+        "Name": "my-public-subnet",
     })
 
-subnet2 = aws.ec2.Subnet("my-subnet-2",
+# Private Subnet (for EKS Node Group)
+subnet_private = aws.ec2.Subnet("my-subnet-private",
     vpc_id=vpc.id,
-    cidr_block="10.0.20.0/24",  # Updated non-conflicting CIDR block
+    cidr_block="10.0.2.0/24",
     availability_zone="ap-southeast-1b",
-    map_public_ip_on_launch=True,
+    map_public_ip_on_launch=False,  # Disables public IP assignment
     tags={
-        "Name": "my-subnet-2",
+        "Name": "my-private-subnet",
     })
 
-# Create a Route Table and Associate it with Subnets
-route_table = aws.ec2.RouteTable("my-route-table",
+# Create a Route Table for Public Subnet
+route_table_public = aws.ec2.RouteTable("my-route-table-public",
     vpc_id=vpc.id,
     routes=[
         aws.ec2.RouteTableRouteArgs(
@@ -46,15 +47,36 @@ route_table = aws.ec2.RouteTable("my-route-table",
         )
     ],
     tags={
-        "Name": "my-route-table",
+        "Name": "my-route-table-public",
     })
 
-# Association for the first subnet
-route_table_assoc1 = aws.ec2.RouteTableAssociation("my-route-table-assoc1",
-    route_table_id=route_table.id,
-    subnet_id=subnet1.id)
+# Associate Public Subnet with Route Table
+route_table_assoc_public = aws.ec2.RouteTableAssociation("my-route-table-assoc-public",
+    route_table_id=route_table_public.id,
+    subnet_id=subnet_public.id)
 
-# Association for the second subnet
-route_table_assoc2 = aws.ec2.RouteTableAssociation("my-route-table-assoc2",
-    route_table_id=route_table.id,
-    subnet_id=subnet2.id)
+# Optionally, create a NAT Gateway for Private Subnet to access the internet
+nat_gateway = aws.ec2.NatGateway("my-nat-gateway",
+    subnet_id=subnet_public.id,  # NAT Gateway must be in a public subnet
+    allocation_id=aws.ec2.Eip("nat-eip", vpc=True).id,
+    tags={
+        "Name": "my-nat-gateway",
+    })
+
+# Create a Route Table for Private Subnet
+route_table_private = aws.ec2.RouteTable("my-route-table-private",
+    vpc_id=vpc.id,
+    routes=[
+        aws.ec2.RouteTableRouteArgs(
+            cidr_block="0.0.0.0/0",
+            nat_gateway_id=nat_gateway.id,  # Use NAT Gateway for internet access
+        )
+    ],
+    tags={
+        "Name": "my-route-table-private",
+    })
+
+# Associate Private Subnet with Route Table
+route_table_assoc_private = aws.ec2.RouteTableAssociation("my-route-table-assoc-private",
+    route_table_id=route_table_private.id,
+    subnet_id=subnet_private.id)

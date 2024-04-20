@@ -3,53 +3,53 @@ import json
 import pulumi_aws as aws
 from vpc import vpc, subnet1, subnet2
 
-
+# IAM Role for EKS Cluster
 eks_role = aws.iam.Role("eks-role",
     assume_role_policy=json.dumps({
         "Version": "2012-10-17",
         "Statement": [{
-            "Effect": "Allow",
+            "Action": "sts:AssumeRole",
             "Principal": {
                 "Service": "eks.amazonaws.com"
             },
-            "Action": "sts:AssumeRole"
-        }, {
             "Effect": "Allow",
-            "Principal": {
-                "Service": "ec2.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
+            "Sid": ""
         }]
     }),
-    tags={"Name": "eks-role"})
+    tags={
+        "Name": "eks-role",
+    })
 
-# Attach IAM policies required for EKS
+# Attach IAM Policies to the Role
 aws.iam.RolePolicyAttachment("eks-cluster-policy",
     role=eks_role.id,
-    policy_arn=aws.iam.get_policy(arn="arn:aws:iam::aws:policy/AmazonEKSClusterPolicy").arn)
+    policy_arn="arn:aws:iam::aws:policy/AmazonEKSClusterPolicy")
 
-aws.iam.RolePolicyAttachment("eks-vpc-resource-controller",
+aws.iam.RolePolicyAttachment("eks-service-policy",
     role=eks_role.id,
-    policy_arn=aws.iam.get_policy(arn="arn:aws:iam::aws:policy/AmazonEKSVPCResourceController").arn)
+    policy_arn="arn:aws:iam::aws:policy/AmazonEKSServicePolicy")
 
 # Create an EKS Cluster
 cluster = aws.eks.Cluster("my-cluster",
     role_arn=eks_role.arn,
     vpc_config=aws.eks.ClusterVpcConfigArgs(
-        subnet_ids=[subnet1.id, subnet2.id]
+        subnet_ids=[subnet_private.id]  # Use private subnet for the EKS nodes
     ),
-    tags={"Name": "my-eks-cluster"})
+    tags={
+        "Name": "my-eks-cluster",
+    })
 
-# Create an EKS Node Group
+# Create a Node Group
 node_group = aws.eks.NodeGroup("my-node-group",
     cluster_name=cluster.name,
     node_role_arn=eks_role.arn,
-    subnet_ids=[subnet1.id, subnet2.id],
+    subnet_ids=[subnet_private.id],  # Use private subnet for the EKS nodes
     scaling_config=aws.eks.NodeGroupScalingConfigArgs(
         desired_size=2,
         max_size=3,
         min_size=1
     ),
     disk_size=20,
-    instance_types=["t3.small"],
-    tags={"Name": "my-eks-node-group"})
+    tags={
+        "Name": "my-node-group",
+    })
