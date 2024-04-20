@@ -16,9 +16,7 @@ eks_role = aws.iam.Role("eks-role",
             "Sid": ""
         }]
     }),
-    tags={
-        "Name": "eks-role",
-    })
+    tags={"Name": "eks-role"})
 
 # Attach IAM Policies to the Role
 aws.iam.RolePolicyAttachment("eks-cluster-policy",
@@ -29,27 +27,23 @@ aws.iam.RolePolicyAttachment("eks-service-policy",
     role=eks_role.id,
     policy_arn="arn:aws:iam::aws:policy/AmazonEKSServicePolicy")
 
-# Create an EKS Cluster
+# Create an EKS Cluster using subnets in different AZs
 cluster = aws.eks.Cluster("my-cluster",
     role_arn=eks_role.arn,
     vpc_config=aws.eks.ClusterVpcConfigArgs(
-        subnet_ids=[subnet_private.id]  # Use private subnet for the EKS nodes
+        subnet_ids=[subnet_private_1.id, subnet_private_2.id]  # Subnets in different AZs
     ),
-    tags={
-        "Name": "my-eks-cluster",
-    })
+    tags={"Name": "my-eks-cluster"})
 
 # Create a Node Group
 node_group = aws.eks.NodeGroup("my-node-group",
     cluster_name=cluster.name,
     node_role_arn=eks_role.arn,
-    subnet_ids=[subnet_private.id],  # Use private subnet for the EKS nodes
+    subnet_ids=[subnet_private_1.id, subnet_private_2.id],  # Matching the AZ diversity requirement
     scaling_config=aws.eks.NodeGroupScalingConfigArgs(
         desired_size=2,
         max_size=3,
         min_size=1
     ),
     disk_size=20,
-    tags={
-        "Name": "my-node-group",
-    })
+    tags={"Name": "my-node-group"})
