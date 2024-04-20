@@ -3,15 +3,14 @@ name: Deploy Infrastructure
 on:
   push:
     branches:
-      - main  # Set this to your default branch
+      - main
   pull_request:
     branches:
-      - main  # Set this to your default branch
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production
 
     steps:
     - name: Checkout Repo
@@ -35,22 +34,20 @@ jobs:
       uses: pulumi/actions@v2
       with:
         command: preview
+        stack-name: 'dev'  # Replace with your actual stack name
       env:
-        # Set these secrets in your GitHub repository
         PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        #PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
 
     - name: Pulumi Up
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       uses: pulumi/actions@v2
       with:
         command: up
+        stack-name: 'your-org/your-project/your-stack'  # Replace with your actual stack name
         args: --yes
       env:
-        # Set these secrets in your GitHub repository
         PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        #PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
