@@ -14,10 +14,10 @@ jobs:
 
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@v3  # Updated to latest major version
+      uses: actions/checkout@v3
 
     - name: Set up Python
-      uses: actions/setup-python@v3  # Updated to latest major version
+      uses: actions/setup-python@v3
       with:
         python-version: '3.x'
 
@@ -25,18 +25,28 @@ jobs:
       run: |
         curl -fsSL https://get.pulumi.com | sh
         echo "/home/runner/.pulumi/bin" >> $GITHUB_PATH
+        pulumi version
 
     - name: Install Dependencies
       run: |
         pip install -r requirements.txt
 
-    - name: Set Pulumi Config - AWS Region
-      run: pulumi config set aws:region ap-southeast-1  # Explicitly setting the AWS region
+    - name: Login to Pulumi
+      run: pulumi login
+      env:
+        PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+    - name: Set Pulumi Config - AWS Region and Debug Info
+      run: |
+        echo "Setting region..."
+        pulumi config set aws:region ap-southeast-1 --logtostderr -v=9
+        echo "Region set. Listing config to verify..."
+        pulumi config --show-secrets
       env:
         PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
     - name: Pulumi Preview
-      uses: pulumi/actions@v3  # Updated to latest major version
+      uses: pulumi/actions@v3
       with:
         command: preview
         stack-name: 'dev'
@@ -47,7 +57,7 @@ jobs:
 
     - name: Pulumi Up
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      uses: pulumi/actions@v3  # Ensure using the latest version that supports Node16
+      uses: pulumi/actions@v3
       with:
         command: up
         stack-name: 'dev'
