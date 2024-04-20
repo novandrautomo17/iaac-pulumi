@@ -14,10 +14,10 @@ jobs:
 
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3  # Updated to latest major version
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3  # Updated to latest major version
       with:
         python-version: '3.x'
 
@@ -31,10 +31,10 @@ jobs:
         pip install -r requirements.txt
 
     - name: Pulumi Preview
-      uses: pulumi/actions@v2
+      uses: pulumi/actions@v3  # Updated to latest major version
       with:
         command: preview
-        stack-name: 'dev'  # Replace with your actual stack name
+        stack-name: 'dev'
       env:
         PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -42,10 +42,10 @@ jobs:
 
     - name: Pulumi Up
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      uses: pulumi/actions@v2
+      uses: pulumi/actions@v3  # Ensure using the latest version that supports Node16
       with:
         command: up
-        stack-name: 'your-org/your-project/your-stack'  # Replace with your actual stack name
+        stack-name: 'dev'
         args: --yes
       env:
         PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
