@@ -7,14 +7,15 @@ from vpc import vpc, subnet_private_1, subnet_private_2, subnet_public
 eks_role = aws.iam.Role("eks-role",
     assume_role_policy=json.dumps({
         "Version": "2012-10-17",
-        "Statement": [{
-            "Action": "sts:AssumeRole",
-            "Principal": {
-                "Service": "eks.amazonaws.com"
-            },
-            "Effect": "Allow",
-            "Sid": ""
-        }]
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "Service": ["eks.amazonaws.com", "ec2.amazonaws.com"]
+                },
+                "Action": "sts:AssumeRole"
+            }
+        ]
     }),
     tags={"Name": "eks-role"})
 
@@ -31,15 +32,16 @@ aws.iam.RolePolicyAttachment("eks-service-policy",
 cluster = aws.eks.Cluster("my-cluster",
     role_arn=eks_role.arn,
     vpc_config=aws.eks.ClusterVpcConfigArgs(
-        subnet_ids=[subnet_private_1.id, subnet_private_2.id]  # Subnets in different AZs
+        subnet_ids=[subnet_private_1.id, subnet_private_2.id]
     ),
     tags={"Name": "my-eks-cluster"})
+
 
 # Create a Node Group
 node_group = aws.eks.NodeGroup("my-node-group",
     cluster_name=cluster.name,
     node_role_arn=eks_role.arn,
-    subnet_ids=[subnet_private_1.id, subnet_private_2.id],  # Matching the AZ diversity requirement
+    subnet_ids=[subnet_private_1.id, subnet_private_2.id],
     scaling_config=aws.eks.NodeGroupScalingConfigArgs(
         desired_size=2,
         max_size=3,
@@ -47,3 +49,4 @@ node_group = aws.eks.NodeGroup("my-node-group",
     ),
     disk_size=20,
     tags={"Name": "my-node-group"})
+
