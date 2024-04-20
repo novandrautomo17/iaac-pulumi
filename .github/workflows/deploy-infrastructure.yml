@@ -30,6 +30,9 @@ jobs:
       run: |
         pip install -r requirements.txt
 
+    - name: Set Pulumi Config - AWS Region
+      run: pulumi config set aws:region ap-southeast-1  # Explicitly setting the AWS region
+
     - name: Pulumi Preview
       uses: pulumi/actions@v3  # Updated to latest major version
       with:
