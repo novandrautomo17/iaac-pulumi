@@ -36,12 +36,15 @@ jobs:
       env:
         PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
-    - name: Set Pulumi Config - AWS Region and Debug Info
+    - name: Select Stack
       run: |
-        echo "Setting region..."
-        pulumi config set aws:region ap-southeast-1 --logtostderr -v=9
-        echo "Region set. Listing config to verify..."
-        pulumi config --show-secrets
+        pulumi stack select dev --create
+      env:
+        PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+    - name: Set Pulumi Config - AWS Region
+      run: |
+        pulumi config set aws:region ap-southeast-1
       env:
         PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
