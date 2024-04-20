@@ -1,6 +1,6 @@
 import pulumi
 import pulumi_aws as aws
-from vpc import subnet, vpc
+from vpc import subnet1, subnet2, vpc
 
 # Security Group for the Bastion Host
 bastion_sg = aws.ec2.SecurityGroup("bastion-sg",
