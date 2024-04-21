@@ -12,7 +12,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment:
-      name: development
+      name: production
       url: ${{ steps.deploy-url.outputs.deployment-url }}
 
     steps:
@@ -41,7 +41,7 @@ jobs:
 
     - name: Select Stack
       run: |
-        pulumi stack select myProject/dev --create
+        pulumi stack select dev --create
       env:
         PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
@@ -61,7 +61,7 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-    - name: Deploy to Dev Environment
+    - name: Deploy to Dev
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       uses: pulumi/actions@v3
       with:
