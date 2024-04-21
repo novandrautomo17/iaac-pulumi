@@ -41,7 +41,7 @@ jobs:
 
     - name: Select Stack
       run: |
-        pulumi stack select myOrg/myProject/dev --create
+        pulumi stack select myProject/dev --create
       env:
         PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
