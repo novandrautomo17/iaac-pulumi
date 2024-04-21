@@ -61,7 +61,7 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-    - name: Deploy to Production
+    - name: Deploy to Dev Environment
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       uses: pulumi/actions@v3
       with:
