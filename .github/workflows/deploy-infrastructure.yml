@@ -11,6 +11,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.deploy-url.outputs.deployment-url }}
 
     steps:
     - name: Checkout Repo
@@ -58,7 +61,7 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-    - name: Pulumi Up
+    - name: Deploy to Production
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       uses: pulumi/actions@v3
       with:
@@ -69,3 +72,5 @@ jobs:
         PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      id: deploy-url
+      continue-on-error: false # Optional based on your requirement

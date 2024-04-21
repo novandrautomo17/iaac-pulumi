@@ -7,9 +7,9 @@ Prerequisites:
 - GitHub Account
 - Git installed on your machine
 - Python installed on your machine
-- Tools Installation
 
 
+## Tools Installation
 #### 1. AWS CLI
 Install the AWS CLI to interact with AWS services directly from your terminal:
 macOS:
