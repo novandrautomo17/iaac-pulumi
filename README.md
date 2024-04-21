@@ -75,12 +75,6 @@ cd iaac-pulumi
 
 Set up Python environment:
 
-```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install pulumi pulumi_aws
-```
-
 Install Python dependencies:
 ```bash
 pip install -r requirements.txt
@@ -95,7 +89,6 @@ Set the AWS region:
 ```bash
 pulumi config set aws:region ap-southeast-1 #change the region accordingly
 ```
-
 
 ## Preview and deploy the infrastructure:
 
@@ -115,7 +108,6 @@ pulumi stack output kubeconfig > kubeconfig.yaml
 export KUBECONFIG=$PWD/kubeconfig.yaml
 kubectl get nodes
 ```
-
 
 ### Cleaning Up
 To destroy the resources:
