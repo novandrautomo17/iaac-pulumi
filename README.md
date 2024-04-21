@@ -4,7 +4,6 @@ This guide walks you through the setup of a Pulumi project that creates an AWS E
 
 Prerequisites:
 - AWS Account
-- GitHub Account
 - Git installed on your machine
 - Python installed on your machine
 
@@ -23,6 +22,7 @@ sudo apt-get install awscli
 ```
 
 Windows: Download from AWS CLI and install using the provided installer.
+
 Configure AWS CLI:
 ```bash
 aws configure
