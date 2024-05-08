@@ -21,7 +21,7 @@ igw = aws.ec2.InternetGateway("my-igw",
 subnet_public = aws.ec2.Subnet("my-subnet-public",
     vpc_id=vpc.id,
     cidr_block="10.0.11.0/24",
-    availability_zone="ap-southeast-1a",
+    availability_zone="ap-southeast-3a",
     map_public_ip_on_launch=True,  # Enables public IP assignment
     tags={
     "Name": "my-public-subnet",
