@@ -21,7 +21,7 @@ igw = aws.ec2.InternetGateway("my-igw",
 subnet_public = aws.ec2.Subnet("my-subnet-public",
     vpc_id=vpc.id,
     cidr_block="10.0.11.0/24",
-    availability_zone="ap-southeast-1a",
+    availability_zone="ap-southeast-3a",
     map_public_ip_on_launch=True,  # Enables public IP assignment
     tags={
     "Name": "my-public-subnet",
@@ -32,7 +32,7 @@ subnet_public = aws.ec2.Subnet("my-subnet-public",
 subnet_private_1 = aws.ec2.Subnet("subnet-private-1",
     vpc_id=vpc.id,
     cidr_block="10.0.31.0/24",
-    availability_zone="ap-southeast-1a",  # First AZ
+    availability_zone="ap-southeast-3a",  # First AZ
     tags={
     "Name": "my-private-subnet-1",
     "kubernetes.io/cluster/my-cluster": "shared"  # Replace 'my-cluster' with the actual cluster name
@@ -41,7 +41,7 @@ subnet_private_1 = aws.ec2.Subnet("subnet-private-1",
 subnet_private_2 = aws.ec2.Subnet("subnet-private-2",
     vpc_id=vpc.id,
     cidr_block="10.0.41.0/24",
-    availability_zone="ap-southeast-1b",  # Second AZ
+    availability_zone="ap-southeast-3b",  # Second AZ
     tags={"Name": "my-private-subnet-2"})
 
 # Create a Route Table for Public Subnet
