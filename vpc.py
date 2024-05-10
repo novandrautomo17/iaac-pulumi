@@ -12,20 +12,19 @@ vpc = aws.ec2.Vpc("my-vpc",
 
 # Create Internet Gateway
 igw = aws.ec2.InternetGateway("my-igw",
-    vpc_id=vpc.id,
+    vpc_id=vpc.id.apply(lambda id: id),  # This uses a lambda to explicitly depend on the VPC's ID
     tags={
         "Name": "my-internet-gateway",
     })
 
-# Public Subnet (for Internet-facing Instances)
+# Similarly, ensure that Subnets wait for the VPC creation
 subnet_public = aws.ec2.Subnet("my-subnet-public",
-    vpc_id=vpc.id,
+    vpc_id=vpc.id.apply(lambda id: id),
     cidr_block="10.0.11.0/24",
     availability_zone="ap-southeast-3a",
-    map_public_ip_on_launch=True,  # Enables public IP assignment
+    map_public_ip_on_launch=True,
     tags={
-    "Name": "my-public-subnet",
-    "kubernetes.io/cluster/my-cluster": "shared"
+        "Name": "my-public-subnet",
     })
 
 # Private Subnet (for EKS Node Group)
