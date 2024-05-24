@@ -1,3 +1,0 @@
-config:
-  aws:skipCredentialsValidation: "true"
-  aws:skipMetadataApiCheck: "false"
