@@ -61,6 +61,9 @@ route_table_assoc_public = aws.ec2.RouteTableAssociation("my-route-table-assoc-p
     route_table_id=route_table_public.id,
     subnet_id=subnet_public.id)
 
+# Create Elastic IP for NAT Gateway
+nat_eip = aws.ec2.Eip("nat-eip", vpc=True)
+
 # Optionally, create a NAT Gateway for Private Subnet to access the internet
 nat_gateway = aws.ec2.NatGateway("my-nat-gateway",
     subnet_id=subnet_public.id,  # NAT Gateway must be in a public subnet
