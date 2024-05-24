@@ -12,14 +12,14 @@ vpc = aws.ec2.Vpc("my-vpc",
 
 # Create Internet Gateway
 igw = aws.ec2.InternetGateway("my-igw",
-    vpc_id=vpc.id.apply(lambda id: id),  # This uses a lambda to explicitly depend on the VPC's ID
+    vpc_id=vpc.id,
     tags={
         "Name": "my-internet-gateway",
     })
 
-# Similarly, ensure that Subnets wait for the VPC creation
+# Public Subnet
 subnet_public = aws.ec2.Subnet("my-subnet-public",
-    vpc_id=vpc.id.apply(lambda id: id),
+    vpc_id=vpc.id,
     cidr_block="10.0.11.0/24",
     availability_zone="ap-southeast-3a",
     map_public_ip_on_launch=True,
@@ -31,17 +31,20 @@ subnet_public = aws.ec2.Subnet("my-subnet-public",
 subnet_private_1 = aws.ec2.Subnet("subnet-private-1",
     vpc_id=vpc.id,
     cidr_block="10.0.31.0/24",
-    availability_zone="ap-southeast-3a",  # First AZ
+    availability_zone="ap-southeast-3a",
     tags={
-    "Name": "my-private-subnet-1",
-    "kubernetes.io/cluster/my-cluster": "shared"  # Replace 'my-cluster' with the actual cluster name
+        "Name": "my-private-subnet-1",
+        "kubernetes.io/cluster/my-cluster": "shared"
     })
 
 subnet_private_2 = aws.ec2.Subnet("subnet-private-2",
     vpc_id=vpc.id,
     cidr_block="10.0.41.0/24",
-    availability_zone="ap-southeast-3b",  # Second AZ
-    tags={"Name": "my-private-subnet-2"})
+    availability_zone="ap-southeast-3b",
+    tags={
+        "Name": "my-private-subnet-2",
+        "kubernetes.io/cluster/my-cluster": "shared"
+    })
 
 # Create a Route Table for Public Subnet
 route_table_public = aws.ec2.RouteTable("my-route-table-public",
@@ -61,21 +64,24 @@ route_table_assoc_public = aws.ec2.RouteTableAssociation("my-route-table-assoc-p
     route_table_id=route_table_public.id,
     subnet_id=subnet_public.id)
 
-# Optionally, create a NAT Gateway for Private Subnet to access the internet
+# Create an Elastic IP for NAT Gateway
+nat_eip = aws.ec2.Eip("nat-eip", vpc=True)
+
+# Create a NAT Gateway
 nat_gateway = aws.ec2.NatGateway("my-nat-gateway",
-    subnet_id=subnet_public.id,  # NAT Gateway must be in a public subnet
-    allocation_id=aws.ec2.Eip("nat-eip", vpc=True).id,
+    subnet_id=subnet_public.id,
+    allocation_id=nat_eip.id,
     tags={
         "Name": "my-nat-gateway",
     })
 
-# Create a Route Table for Private Subnet
+# Create a Route Table for Private Subnets
 route_table_private = aws.ec2.RouteTable("my-route-table-private",
     vpc_id=vpc.id,
     routes=[
         aws.ec2.RouteTableRouteArgs(
             cidr_block="0.0.0.0/0",
-            nat_gateway_id=nat_gateway.id,  # Use NAT Gateway for internet access
+            nat_gateway_id=nat_gateway.id,
         )
     ],
     tags={
@@ -83,12 +89,12 @@ route_table_private = aws.ec2.RouteTable("my-route-table-private",
     })
 
 # Associate the first private subnet
-aws.ec2.RouteTableAssociation("my-route-table-assoc-private-1",
+route_table_assoc_private_1 = aws.ec2.RouteTableAssociation("my-route-table-assoc-private-1",
     route_table_id=route_table_private.id,
     subnet_id=subnet_private_1.id)
 
 # Associate the second private subnet
-aws.ec2.RouteTableAssociation("my-route-table-assoc-private-2",
+route_table_assoc_private_2 = aws.ec2.RouteTableAssociation("my-route-table-assoc-private-2",
     route_table_id=route_table_private.id,
     subnet_id=subnet_private_2.id)
 
@@ -106,3 +112,9 @@ eks_node_sg = aws.ec2.SecurityGroup('eks-node-sg',
         "Name": "eks-node-sg"
     }
 )
+
+# Export the VPC ID and Subnet IDs
+pulumi.export('vpc_id', vpc.id)
+pulumi.export('public_subnet_id', subnet_public.id)
+pulumi.export('private_subnet_id_1', subnet_private_1.id)
+pulumi.export('private_subnet_id_2', subnet_private_2.id)
